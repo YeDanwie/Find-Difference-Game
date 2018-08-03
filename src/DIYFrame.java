@@ -184,14 +184,8 @@ public class DIYFrame extends JFrame implements ActionListener{
 
 		public void mouseClicked(MouseEvent e) 
 		{
-			Thread thread=new Thread(new Runnable(){
-				public void run()
-				{
-					PlayMusic click=new PlayMusic("Music\\click.wav");
-					click.play();
-				}
-			});
-			thread.start();//开启一个线程播放点击音效
+			MusicPlayer mp = new MusicPlayer("Music\\click.wav");//开启一个线程播放点击音效
+			mp.start(false);
 			
 			//如果两张图片均已显示出来（玩家开始点击不同处），将坐标保存起来
 			if(panel_left.picsShowed&&panel_right.picsShowed)
