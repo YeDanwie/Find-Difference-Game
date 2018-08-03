@@ -50,14 +50,8 @@ public class SelectPanel extends JPanel implements ActionListener{
 		//事件源是 上一关 按钮
 		if(ae.getSource().equals(pre_button))
 		{
-			Thread thread=new Thread(new Runnable(){
-				public void run()
-				{
-					PlayMusic click=new PlayMusic("Music\\click.wav");
-					click.play();
-				}
-			});
-			thread.start();//开启一个线程播放点击音效
+			MusicPlayer mp = new MusicPlayer("Music\\click.wav");//开启一个线程播放点击音效
+			mp.start(false);
 
 			bg_panel.order--;//关卡序数-1
 			//令关卡序数在合法范围内
@@ -74,14 +68,8 @@ public class SelectPanel extends JPanel implements ActionListener{
 		//事件源是开始游戏按钮
 		else if(ae.getSource().equals(enter_button))
 		{
-			Thread thread=new Thread(new Runnable(){
-				public void run()
-				{
-					PlayMusic click=new PlayMusic("Music\\click.wav");
-					click.play();
-				}
-			});
-			thread.start();//开启一个线程播放点击音效
+			MusicPlayer mp = new MusicPlayer("Music\\click.wav");//开启一个线程播放点击音效
+			mp.start(false);
 			
 			//更新选择关卡的面板，进入到玩家所选的关卡开始游戏
 			frame.getContentPane().removeAll();
@@ -99,14 +87,8 @@ public class SelectPanel extends JPanel implements ActionListener{
 		//事件源是下一关按钮
 		else if(ae.getSource().equals(next_button))
 		{
-			Thread thread=new Thread(new Runnable(){
-				public void run()
-				{
-					PlayMusic click=new PlayMusic("Music\\click.wav");
-					click.play();
-				}
-			});
-			thread.start();//播放点击音效
+			MusicPlayer mp = new MusicPlayer("Music\\click.wav");//开启一个线程播放点击音效
+			mp.start(false);
 			
 			//关卡序数+1
 			bg_panel.order++;
@@ -124,14 +106,8 @@ public class SelectPanel extends JPanel implements ActionListener{
 		//事件源是返回主菜单按钮
 		else if(ae.getSource().equals(goback_button))
 		{
-			Thread thread=new Thread(new Runnable(){
-				public void run()
-				{
-					PlayMusic click=new PlayMusic("Music\\click.wav");
-					click.play();
-				}
-			});
-			thread.start();//播放点击音效
+			MusicPlayer mp = new MusicPlayer("Music\\click.wav");//开启一个线程播放点击音效
+			mp.start(false);
 			
 			//更新面板，进入到主菜单面板
 			this.frame.getContentPane().removeAll();
