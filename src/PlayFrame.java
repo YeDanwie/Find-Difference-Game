@@ -80,14 +80,8 @@ public class PlayFrame extends JFrame implements ActionListener,MouseListener{
 		//事件源是随机游戏按钮
 		if(ae.getSource().equals(play_button))
 		{
-			Thread thread=new Thread(new Runnable(){
-				public void run()
-				{
-					PlayMusic click=new PlayMusic("Music\\click.wav");
-					click.play();
-				}
-			});
-			thread.start();//开启线程播放点击音效
+			MusicPlayer mp = new MusicPlayer("Music\\click.wav");//开启线程播放点击音效
+			mp.start(false);
 			
 			
 			//在默认关卡里随机选择一个，然后更新面板进入游戏面板开始游戏
@@ -105,14 +99,8 @@ public class PlayFrame extends JFrame implements ActionListener,MouseListener{
 		//事件源是选择关卡按钮
 		else if(ae.getSource().equals(select_button))
 		{
-			Thread thread=new Thread(new Runnable(){
-				public void run()
-				{
-					PlayMusic click=new PlayMusic("Music\\click.wav");
-					click.play();
-				}
-			});
-			thread.start();//开启一个线程播放点击音效
+			MusicPlayer mp = new MusicPlayer("Music\\click.wav");//开启一个线程播放点击音效
+			mp.start(false);
 			
 			//更新面板进入选择关卡面板
 			super.getContentPane().removeAll();
@@ -123,14 +111,8 @@ public class PlayFrame extends JFrame implements ActionListener,MouseListener{
 		//事件源是导入关卡按钮
 		else if(ae.getSource().equals(diy_button))
 		{
-			Thread thread=new Thread(new Runnable(){
-				public void run()
-				{
-					PlayMusic click=new PlayMusic("Music\\click.wav");
-					click.play();
-				}
-			});
-			thread.start();//开启一个线程播放点击音效
+			MusicPlayer mp = new MusicPlayer("Music\\click.wav");//开启一个线程播放点击音效
+			mp.start(false);
 			
 			new DIYFrame();//新建一个导入关卡的窗体
 		}
@@ -143,14 +125,8 @@ public class PlayFrame extends JFrame implements ActionListener,MouseListener{
 
 	//在主菜单上点击时播放点击音效
 	public void mouseClicked(MouseEvent arg0) {
-		Thread thread=new Thread(new Runnable(){
-			public void run()
-			{
-				PlayMusic click=new PlayMusic("Music\\click.wav");
-				click.play();
-			}
-		});
-		thread.start();
+		MusicPlayer mp = new MusicPlayer("Music\\click.wav");//开启一个线程播放点击音效
+		mp.start(false);
 	}
 
 	//改变鼠标外形为红色箭头
