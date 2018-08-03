@@ -102,14 +102,8 @@ public class PlayingPanel extends JPanel implements ActionListener,MouseListener
 	}
 	
 	public void actionPerformed(ActionEvent ae) {
-		Thread thread=new Thread(new Runnable(){
-			public void run()
-			{
-				PlayMusic click=new PlayMusic("Music\\click.wav");
-				click.play();
-			}
-		});
-		thread.start();//开启线程播放点击音效
+		MusicPlayer mp = new MusicPlayer("Music\\click.wav");//开启一个线程播放点击音效
+		mp.start(false);
 		
 		//如果游戏中途点击返回主菜单按钮，则停止倒数线程
 		countdown.stop();
@@ -121,22 +115,20 @@ public class PlayingPanel extends JPanel implements ActionListener,MouseListener
 
 	public void mouseClicked(MouseEvent me) {
 		
-		Thread thread1=new Thread(new Runnable(){
-			public void run()
-			{
-				PlayMusic click=new PlayMusic("Music\\click.wav");
-				click.play();
-			}
-		});
-		thread1.start();//点击时播放点击点击音效
+		MusicPlayer mp = new MusicPlayer("Music\\click.wav");//开启一个线程播放点击音效
+		mp.start(false);
 		
 		//传入点击时的坐标并重新绘制面板
 		cl_panel.userXY[0]=(int)(me.getX());cl_panel.userXY[1]=(int)(me.getY());
 		cr_panel.userXY[0]=(int)(me.getX());cr_panel.userXY[1]=(int)(me.getY());
-		cl_panel.repaint(); cr_panel.repaint();
+		
+		cl_panel.judge();
+		cr_panel.judge();
+		cl_panel.repaint();
+		cr_panel.repaint();
 		
 		//五处不同全找出来之后，显示通关对话框，然后返回主菜单
-		if(cl_panel.user_correct.size()==8)//这里应该是等于10才对（五个点则有十个值）。但是写成等于10的话，五处不同找出来后要再点击一次才会显示对话框。为什么？！！
+		if(cl_panel.user_correct.size()==10)
 		{
 			//终止倒数线程，显示对话框通过并回主菜单
 			countdown.stop();
@@ -190,6 +182,42 @@ class CenterPanel extends JPanel
 		
 	}
 	
+	public void judge() {
+		Point p0=new Point((int)userXY[0],(int)userXY[1]);//玩家点击出的坐标点
+		
+		//判断是否正确
+		boolean isCorrect=false;
+		int i;
+		for(i=0;i<XY.length;i+=2)
+		{
+			Point p=new Point((int)XY[i],(int)XY[i+1]);
+			if(p.distance(p0)<=13) 
+			{
+				isCorrect=true;
+				break;
+			}
+		}
+		
+		//判断是否已存在（之前已经点击正确了）
+		boolean exist=false;
+		for(int j=0;j<user_correct.size();j+=2)
+		{
+			Point p=new Point((int)(double)(user_correct.get(j)),(int)(double)(user_correct.get(j+1)));
+			if(p.distance(p0)<=13) 
+			{
+				exist=true;
+				break;
+			}
+		}
+		
+		//如果玩家点击的是 新的不同处，则将点加入到user_correct
+		if(isCorrect&&exist==false) 
+		{
+			user_correct.add(XY[i]);
+			user_correct.add(XY[i+1]);
+		}
+	}
+	
 	//绘制面板
 	@Override
 	public void paint(Graphics g)
@@ -204,41 +232,6 @@ class CenterPanel extends JPanel
 			g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
 			g2d.setStroke(new BasicStroke(5));
 			g2d.setColor(Color.RED);
-			
-			
-			Point p0=new Point((int)userXY[0],(int)userXY[1]);//玩家点击出的坐标点
-			
-			//判断是否正确
-			boolean isCorrect=false;
-			int i;
-			for(i=0;i<XY.length;i+=2)
-			{
-				Point p=new Point((int)XY[i],(int)XY[i+1]);
-				if(p.distance(p0)<=13) 
-				{
-					isCorrect=true;
-					break;
-				}
-			}
-			
-			//判断是否已存在（之前已经点击正确了）
-			boolean exist=false;
-			for(int j=0;j<user_correct.size();j+=2)
-			{
-				Point p=new Point((int)(double)(user_correct.get(j)),(int)(double)(user_correct.get(j+1)));
-				if(p.distance(p0)<=13) 
-				{
-					exist=true;
-					break;
-				}
-			}
-			
-			//如果玩家点击的是 新的不同处，则将点加入到user_correct
-			if(isCorrect&&exist==false) 
-			{
-				user_correct.add(XY[i]);
-				user_correct.add(XY[i+1]);
-			}
 
 			//绘制玩家已点击的正确之处（用画圆圈表示）
 			for(int j=0;j<user_correct.size();j+=2)
