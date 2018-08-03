@@ -63,7 +63,10 @@ public class DIYdata {
 	//根据key值（0读取自带关卡，1读取玩家导入关卡）将数据赋值给参数
 	public void get(int key,ArrayList<String> name1,ArrayList<String> name2,ArrayList<double[]> XY)
 	{
-		if(key==1)message=new File(data_path+File.separator+"message.txt");
+		if(key==1) {
+			return; //没有玩家导入的关卡(这部分功能暂时弃用)
+			//message=new File(data_path+File.separator+"message.txt");
+		}
 		else message=new File("DefaultData\\message.txt");
 
 		try {
