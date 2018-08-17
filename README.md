@@ -1,4 +1,4 @@
-# FindDifference 找茬游戏，Java Swing编程
+# 找茬游戏，Java Swing编程
 
 ## 功能介绍
 
