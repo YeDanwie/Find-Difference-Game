@@ -39,25 +39,28 @@ public class DIYFrame extends JFrame implements ActionListener{
 		tips=new JTextArea();
 		panel_south.add(tips);
 		tips.setEditable(false);
-		tips.setFont(new Font("幼圆",0,18));
+		tips.setFont(new Font("楷体",0,18));
 		tips.append("-请依次导入两张图片\n-图片长宽比大致为3：2\n-且图中有五处不同");
 		
 		message=new JTextArea();
 		message.setEditable(false);
-		message.setFont(new Font("华文彩云",0,18));
+		message.setFont(new Font("黑体",0,30));
 		panel_south.add(message);
 		
 		
 		goback=new JButton("撤销"); finish=new JButton("完成");
 		goback.addActionListener(this); finish.addActionListener(this);
-		JPanel buttonPanel=new JPanel(); buttonPanel.setBackground(Color.WHITE);
+		JPanel buttonPanel=new JPanel(); 
+		buttonPanel.setBackground(Color.WHITE);
 		buttonPanel.add(goback); buttonPanel.add(finish);
 		panel_south.add(buttonPanel);
 		
 		this.getContentPane().add(panel_south,BorderLayout.SOUTH);
 		this.setResizable(false);
 		this.validate();
-		this.setVisible(true);
+		this.setVisible(true);		
+		
+		
 	}
 	
 	public void actionPerformed(ActionEvent ae) {
@@ -72,7 +75,7 @@ public class DIYFrame extends JFrame implements ActionListener{
 			if(chooser.showOpenDialog(this)!=JFileChooser.APPROVE_OPTION) return;
 			
 			//获取玩家选择的图片
-			Image image=Toolkit.getDefaultToolkit().createImage(chooser.getSelectedFile().getAbsolutePath());
+			Image image=Toolkit.getDefaultToolkit().createImage(chooser.getSelectedFile().getAbsolutePath());//绝对路径
 			imageCopy=image.getScaledInstance(512, 360, Image.SCALE_DEFAULT);
 			
 			//将玩家选择的图片绘制出来
@@ -170,9 +173,9 @@ public class DIYFrame extends JFrame implements ActionListener{
 			g2d.setStroke(new BasicStroke(5)); 
 			g2d.setColor(Color.RED);
 			
-			//以不同处坐标点为圆心，半径为12画圆圈
+			//以不同处坐标点为圆心画圆圈
 			for(Point p:pList)
-				g2d.drawArc((int)(p.getX()-12), (int)(p.getY()-12), 30, 30, 0, 360);
+				g2d.drawArc((int)(p.getX()-20), (int)(p.getY()-20), 40, 40, 0, 360);
 			
 			//画出两张图片的分割线
 			g2d.setStroke(new BasicStroke(5)); 
@@ -184,8 +187,14 @@ public class DIYFrame extends JFrame implements ActionListener{
 
 		public void mouseClicked(MouseEvent e) 
 		{
-			MusicPlayer mp = new MusicPlayer("Music\\click.wav");//开启一个线程播放点击音效
-			mp.start(false);
+			Thread thread=new Thread(new Runnable(){
+				public void run()
+				{
+					PlayMusic click=new PlayMusic("Music\\click.wav");
+					click.play();
+				}
+			});
+			thread.start();//开启一个线程播放点击音效
 			
 			//如果两张图片均已显示出来（玩家开始点击不同处），将坐标保存起来
 			if(panel_left.picsShowed&&panel_right.picsShowed)
@@ -195,8 +204,10 @@ public class DIYFrame extends JFrame implements ActionListener{
 			}
 			
 			//将新保存的坐标绘制出来
-			if(panel_left.getComponentCount()==0) panel_left.repaint();
-			if(panel_right.getComponentCount()==0) panel_right.repaint();
+			if(panel_left.getComponentCount()==0) 
+				panel_left.repaint();
+			if(panel_right.getComponentCount()==0) 
+				panel_right.repaint();
 		}
 
 		//改变鼠标外形为红色箭头

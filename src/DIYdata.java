@@ -7,7 +7,7 @@ public class DIYdata {
 	String source2_path,source2_name;
 	File message;
 	double[] pointXY;
-	static String data_path="D:\\DIYdata";
+	static String data_path="D:\\DIYdata";//玩家导入数据存储路径
 	ArrayList<String> data;  
 	
 	//将文件保存到指定路径
@@ -57,15 +57,17 @@ public class DIYdata {
         fw.append(source1_name+' '+source2_name+' ');
         for(double xy:pointXY) fw.append(xy+" ");
         fw.append("\n");
-        fw.close();
+        fw.close();     
+        
 	}
 	
 	//根据key值（0读取自带关卡，1读取玩家导入关卡）将数据赋值给参数
 	public void get(int key,ArrayList<String> name1,ArrayList<String> name2,ArrayList<double[]> XY)
 	{
-		if(key==1) {
-			return; //没有玩家导入的关卡(这部分功能暂时弃用)
-			//message=new File(data_path+File.separator+"message.txt");
+		if(key==1) 
+		{
+			message=new File(data_path+File.separator+"message.txt");
+			if(!message.exists()) return;
 		}
 		else message=new File("DefaultData\\message.txt");
 
