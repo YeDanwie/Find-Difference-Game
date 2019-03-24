@@ -22,11 +22,11 @@ public class SelectPanel extends JPanel implements ActionListener{
 		name1=new ArrayList<String>();
 		name2=new ArrayList<String>();
 		XY=new ArrayList<double[]>();
-		diy_data.get(1,name1, name2, XY);
+		diy_data.get(1,name1, name2, XY); //玩家导入关卡
 		nameA=new ArrayList<String>();
 		nameB=new ArrayList<String>();
 		DXY=new ArrayList<double[]>();
-		diy_data.get(0, nameA, nameB, DXY);
+		diy_data.get(0, nameA, nameB, DXY); //自带关卡
 		
 		bg_panel=new MyPanel(name1,nameA);
 		super.add(bg_panel,BorderLayout.CENTER);
@@ -37,7 +37,7 @@ public class SelectPanel extends JPanel implements ActionListener{
 		goback_button=new MyButton("返回"); goback_button.addActionListener(this);
 		
 		button_panel=new JPanel();
-		button_panel.setBackground(new Color(167,133,95));
+		button_panel.setBackground(new Color(211,211,211));
 		button_panel.add(pre_button);
 		button_panel.add(enter_button);
 		button_panel.add(next_button);
@@ -50,8 +50,14 @@ public class SelectPanel extends JPanel implements ActionListener{
 		//事件源是 上一关 按钮
 		if(ae.getSource().equals(pre_button))
 		{
-			MusicPlayer mp = new MusicPlayer("Music\\click.wav");//开启一个线程播放点击音效
-			mp.start(false);
+			Thread thread=new Thread(new Runnable(){
+				public void run()
+				{
+					PlayMusic click=new PlayMusic("Music\\click.wav");
+					click.play();
+				}
+			});
+			thread.start();//开启一个线程播放点击音效
 
 			bg_panel.order--;//关卡序数-1
 			//令关卡序数在合法范围内
@@ -68,8 +74,14 @@ public class SelectPanel extends JPanel implements ActionListener{
 		//事件源是开始游戏按钮
 		else if(ae.getSource().equals(enter_button))
 		{
-			MusicPlayer mp = new MusicPlayer("Music\\click.wav");//开启一个线程播放点击音效
-			mp.start(false);
+			Thread thread=new Thread(new Runnable(){
+				public void run()
+				{
+					PlayMusic click=new PlayMusic("Music\\click.wav");
+					click.play();
+				}
+			});
+			thread.start();//开启一个线程播放点击音效
 			
 			//更新选择关卡的面板，进入到玩家所选的关卡开始游戏
 			frame.getContentPane().removeAll();
@@ -87,8 +99,14 @@ public class SelectPanel extends JPanel implements ActionListener{
 		//事件源是下一关按钮
 		else if(ae.getSource().equals(next_button))
 		{
-			MusicPlayer mp = new MusicPlayer("Music\\click.wav");//开启一个线程播放点击音效
-			mp.start(false);
+			Thread thread=new Thread(new Runnable(){
+				public void run()
+				{
+					PlayMusic click=new PlayMusic("Music\\click.wav");
+					click.play();
+				}
+			});
+			thread.start();//播放点击音效
 			
 			//关卡序数+1
 			bg_panel.order++;
@@ -106,8 +124,14 @@ public class SelectPanel extends JPanel implements ActionListener{
 		//事件源是返回主菜单按钮
 		else if(ae.getSource().equals(goback_button))
 		{
-			MusicPlayer mp = new MusicPlayer("Music\\click.wav");//开启一个线程播放点击音效
-			mp.start(false);
+			Thread thread=new Thread(new Runnable(){
+				public void run()
+				{
+					PlayMusic click=new PlayMusic("Music\\click.wav");
+					click.play();
+				}
+			});
+			thread.start();//播放点击音效
 			
 			//更新面板，进入到主菜单面板
 			this.frame.getContentPane().removeAll();
@@ -121,7 +145,7 @@ public class SelectPanel extends JPanel implements ActionListener{
 //自定义面板样式
 class MyPanel extends JPanel{
 	private ArrayList<String> diy_image,default_image;
-	public int order;
+	public int order; //标志哪张图
 	
 	//构造方法，为变量赋值
 	MyPanel(ArrayList<String> diy_image,ArrayList<String> default_image)

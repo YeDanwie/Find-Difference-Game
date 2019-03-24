@@ -12,9 +12,10 @@ public class PlayingPanel extends JPanel implements ActionListener,MouseListener
 	double[] pointXY;//图片不同处的坐标，每两个值为一个坐标
 	private JPanel south_panel;
 	CenterPanel cl_panel,cr_panel;
-	private MyButton home_button;
+	private MyButton home_button,show_button;
 	private JProgressBar pbar;
 	private Thread countdown;
+	JTextArea score_print;
 	
 	//游戏面板的初始化
 	PlayingPanel(PlayFrame frame,String name1,String name2,double[] pointXY)
@@ -27,15 +28,16 @@ public class PlayingPanel extends JPanel implements ActionListener,MouseListener
 		
 		this.addMouseListener(this);
 		this.setLayout(new BorderLayout());
-		this.setBackground(new Color(167,133,95));
+		this.setBackground(new Color(225,255,255));
 		
 		JPanel center_panel=new JPanel();
 		center_panel.setLayout(new GridLayout(1,2));
+		center_panel.setBackground(new Color(225,255,255));
 		this.add(center_panel,BorderLayout.CENTER);
 
-		south_panel=new JPanel(new GridLayout(1,3));
+		south_panel=new JPanel(new GridLayout(1,4));
 		south_panel.setBorder(new EmptyBorder(20,0,20,0));
-		south_panel.setBackground(new Color(167,133,95));
+		south_panel.setBackground(new Color(225,255,255));
 		
 		cl_panel=new CenterPanel(name1,pointXY); cl_panel.addMouseListener(this);
 		cr_panel=new CenterPanel(name2,pointXY); cr_panel.addMouseListener(this);
@@ -43,38 +45,40 @@ public class PlayingPanel extends JPanel implements ActionListener,MouseListener
 		
 		JTextArea tips=new JTextArea();
 		tips.setEditable(false);
-		tips.setFont(new Font("幼圆",0,20));
-		tips.append("-图片共有五处不同\n-擦亮双眼找出它们\n-限时30秒  祝好运");
-		tips.setOpaque(false);
-		tips.setBorder(new EmptyBorder(0,10,0,10));
+		tips.setFont(new Font("楷体",0,22));
+		tips.append("-图片共有五处不同\n-限时50秒");
+		tips.setOpaque(false); //透明
+		tips.setBorder(new EmptyBorder(12,10,12,10));
 		south_panel.add(tips);
 
-		pbar=new JProgressBar(0,30);
-		pbar.setBackground(new Color(167,133,95));
-		pbar.setBorder(new EmptyBorder(5,0,5,0));
-		pbar.setValue(30);
-		pbar.setForeground(Color.RED);
+		pbar=new JProgressBar(0,50);
+		pbar.setBackground(new Color(225,255,255));
+		pbar.setBorder(new EmptyBorder(20,0,20,0));
+		pbar.setValue(50);
+		pbar.setForeground(new Color(255,105,180));
 		south_panel.add(pbar);
 		
 		countdown=new Thread(new Runnable(){
 			
 			public void run()
 			{
-				int count=30;
+				int count=50;
 				PlayFrame play_frame=PF;
-				while(count>=0)
-				{
+				while(count>=0 && cl_panel.score<5)  //计时结束 和 找出5处后 结束
+				{		
 					try{Thread.sleep(1000);}
 					catch(Exception e){}
 					pbar.setValue(count--);
 					String str=new String().format("时间剩余 %d s", pbar.getValue());
 					pbar.setString(str);
 					pbar.setStringPainted(true);
-					
+					String s=new String().format("%d",cl_panel.score);//输出分数
+					score_print.setText(s);					
 				}
 				
-				//超时后显示对话框，然后回到主菜单
-				JOptionPane.showMessageDialog(play_frame, "时间到咯。想一想，不充钱你会变得更强么？","超时",JOptionPane.PLAIN_MESSAGE);
+				//结束后显示对话框，然后回到主菜单
+				String s=new String().format("得分：  %d ", cl_panel.score);
+				JOptionPane.showMessageDialog(play_frame, s,"结束",JOptionPane.PLAIN_MESSAGE);
 				play_frame.getContentPane().removeAll();
 				((JPanel)(play_frame.getContentPane())).updateUI();
 				play_frame.getContentPane().repaint();
@@ -82,28 +86,54 @@ public class PlayingPanel extends JPanel implements ActionListener,MouseListener
 			}
 		});
 		countdown.start();//开始倒数线程
-		
-		
+     	
 		home_button=new MyButton("主菜单");
 		home_button.addActionListener(this);
+
+		show_button=new MyButton("显示所有答案");
+		show_button.addActionListener(this);
+		
 		JPanel button_panel=new JPanel();
 		button_panel.setOpaque(false);
 		button_panel.add(home_button);
+		button_panel.add(show_button);
+		
 		south_panel.add(button_panel);
 		
-		this.add(south_panel,BorderLayout.SOUTH);
-
-		ImageIcon icon=new ImageIcon("Images\\title.gif");
-		JLabel label=new JLabel(icon);
-		label.setBorder(new EmptyBorder(30,0,30,0));
-		this.add(label,BorderLayout.NORTH);
 		
+		this.add(south_panel,BorderLayout.SOUTH);
+	
+		score_print=new JTextArea();
+		score_print.setFont(new Font("黑体",0,60));
+		score_print.setForeground(new Color(255,160,122)); 
+		score_print.setOpaque(false); //透明
+		score_print.setEditable(false);
+		score_print.setBorder(new EmptyBorder(30,495,35,495));
+		score_print.setText("0");
+		this.add(score_print,BorderLayout.NORTH);
+								
 		frame.setSize(1024,640);
+		
+		PF.addWindowListener(new WindowAdapter(){
+			public void windowClosed(WindowEvent we)
+			{
+				countdown.stop();
+			}
+		});
+		
 	}
 	
 	public void actionPerformed(ActionEvent ae) {
-		MusicPlayer mp = new MusicPlayer("Music\\click.wav");//开启一个线程播放点击音效
-		mp.start(false);
+		if(ae.getSource().equals(home_button))
+		{
+		Thread thread=new Thread(new Runnable(){
+			public void run()
+			{
+				PlayMusic click=new PlayMusic("Music\\click.wav");
+				click.play();
+			}
+		});
+		thread.start();//开启线程播放点击音效
 		
 		//如果游戏中途点击返回主菜单按钮，则停止倒数线程
 		countdown.stop();
@@ -111,36 +141,51 @@ public class PlayingPanel extends JPanel implements ActionListener,MouseListener
 		((JPanel)(this.frame.getContentPane())).updateUI();
 		this.frame.getContentPane().repaint();
 		this.frame.initCover();
+		}
+		else //显示所有不同处
+		{
+			Thread thread=new Thread(new Runnable(){
+				public void run()
+				{
+					PlayMusic click=new PlayMusic("Music\\click.wav");
+					click.play();
+				}
+			});
+			thread.start();//开启线程播放点击音效
+			
+			countdown.stop();
+			int i;
+			for(i=0;i<cl_panel.XY.length;i+=2)
+			{
+					cl_panel.user_correct.add(cl_panel.XY[i]);
+					cr_panel.user_correct.add(cl_panel.XY[i]);
+					cl_panel.user_correct.add(cl_panel.XY[i+1]);
+					cr_panel.user_correct.add(cl_panel.XY[i+1]);
+			}
+			cl_panel.repaint();
+			cr_panel.repaint();
+			
+			show_button.setEnabled(false);
+		}
+		
 	}
 
 	public void mouseClicked(MouseEvent me) {
 		
-		MusicPlayer mp = new MusicPlayer("Music\\click.wav");//开启一个线程播放点击音效
-		mp.start(false);
-		
+		Thread thread1=new Thread(new Runnable(){
+			public void run()
+			{
+				PlayMusic click=new PlayMusic("Music\\click.wav");
+				click.play();
+			}
+		});
+		thread1.start();//点击时播放点击点击音效
+						
 		//传入点击时的坐标并重新绘制面板
 		cl_panel.userXY[0]=(int)(me.getX());cl_panel.userXY[1]=(int)(me.getY());
 		cr_panel.userXY[0]=(int)(me.getX());cr_panel.userXY[1]=(int)(me.getY());
-		
-		cl_panel.judge();
-		cr_panel.judge();
-		cl_panel.repaint();
-		cr_panel.repaint();
-		
-		//五处不同全找出来之后，显示通关对话框，然后返回主菜单
-		if(cl_panel.user_correct.size()==10)
-		{
-			//终止倒数线程，显示对话框通过并回主菜单
-			countdown.stop();
-			JOptionPane.showMessageDialog(frame, "一看就是老江湖了，不同处居然全都找了出来","通关",JOptionPane.PLAIN_MESSAGE,new ImageIcon("look.png"));
+		cl_panel.repaint(); cr_panel.repaint();
 			
-			this.frame.getContentPane().removeAll();
-			((JPanel)(this.frame.getContentPane())).updateUI();
-			
-			this.frame.getContentPane().repaint();
-			this.frame.initCover();
-		}
-		
 	}
 
 	//改变鼠标外形为红色箭头
@@ -165,57 +210,23 @@ class CenterPanel extends JPanel
 	Image imageCopy;
 	double[] XY,userXY;
 	ArrayList<Double> user_correct;
+	int score; //得分
 	
 	//构造方法，对变量进行赋值
 	CenterPanel(String name,double[] XY)
 	{
 		this.name=name;
+		this.XY=XY;
 		Image image;
-		image=Toolkit.getDefaultToolkit().getImage("D:\\DIYdata\\"+name);
 		
 		File file=new File("D:\\DIYdata\\"+name);
 		if(!file.exists()) image=Toolkit.getDefaultToolkit().getImage("DefaultData\\"+name);
+		else image=Toolkit.getDefaultToolkit().getImage("D:\\DIYdata\\"+name);
 		imageCopy=image.getScaledInstance(512, 360, Image.SCALE_DEFAULT);
-		this.XY=XY;
+		
 		userXY=new double[2]; userXY[0]=-256; userXY[1]=-256;
 		user_correct=new ArrayList<Double>();
-		
-	}
-	
-	public void judge() {
-		Point p0=new Point((int)userXY[0],(int)userXY[1]);//玩家点击出的坐标点
-		
-		//判断是否正确
-		boolean isCorrect=false;
-		int i;
-		for(i=0;i<XY.length;i+=2)
-		{
-			Point p=new Point((int)XY[i],(int)XY[i+1]);
-			if(p.distance(p0)<=13) 
-			{
-				isCorrect=true;
-				break;
-			}
-		}
-		
-		//判断是否已存在（之前已经点击正确了）
-		boolean exist=false;
-		for(int j=0;j<user_correct.size();j+=2)
-		{
-			Point p=new Point((int)(double)(user_correct.get(j)),(int)(double)(user_correct.get(j+1)));
-			if(p.distance(p0)<=13) 
-			{
-				exist=true;
-				break;
-			}
-		}
-		
-		//如果玩家点击的是 新的不同处，则将点加入到user_correct
-		if(isCorrect&&exist==false) 
-		{
-			user_correct.add(XY[i]);
-			user_correct.add(XY[i+1]);
-		}
+		score=0;
 	}
 	
 	//绘制面板
@@ -229,19 +240,55 @@ class CenterPanel extends JPanel
 			g2d.drawImage(imageCopy,0, 0, this);//绘制图片
 			
 			//画笔抗锯齿及设置画笔的粗细、颜色
-			g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+			g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);//抗锯齿
 			g2d.setStroke(new BasicStroke(5));
 			g2d.setColor(Color.RED);
+			
+			
+			Point p0=new Point((int)userXY[0],(int)userXY[1]);//玩家点击出的坐标点
+			
+			//判断是否正确
+			boolean isCorrect=false;
+			int i;
+			for(i=0;i<XY.length;i+=2)
+			{
+				Point p=new Point((int)XY[i],(int)XY[i+1]);
+				if(p.distance(p0)<=30) 
+				{
+					isCorrect=true;
+					break;
+				}
+			}
+			
+			//判断是否已存在（之前已经点击正确了）
+			boolean exist=false;
+			for(int j=0;j<user_correct.size();j+=2)
+			{
+				Point p=new Point((int)(double)(user_correct.get(j)),(int)(double)(user_correct.get(j+1)));
+				if(p.distance(p0)<=30) 
+				{
+					exist=true;
+					break;
+				}
+			}
+			
+			//如果玩家点击的是 新的不同处，则将点加入到user_correct
+			if(isCorrect&&exist==false) 
+			{
+				user_correct.add(XY[i]);
+				user_correct.add(XY[i+1]);
+				score++;
+			}
 
 			//绘制玩家已点击的正确之处（用画圆圈表示）
 			for(int j=0;j<user_correct.size();j+=2)
-				g2d.drawArc((int)(double)(user_correct.get(j)-12), (int)(double)(user_correct.get(j+1)-12), 30, 30, 0, 360);
+				g2d.drawArc((int)(double)(user_correct.get(j)-20), (int)(double)(user_correct.get(j+1)-20), 40, 40, 0, 360);
 			
 			//绘制两张图片的分割线
-			g2d.setStroke(new BasicStroke(5)); 
+			g2d.setStroke(new BasicStroke(2)); 
 			g2d.setColor(Color.WHITE);
 			g2d.drawLine(this.getSize().width, 0, this.getSize().width, this.getSize().height);
-
+			g2d.drawLine(0, 0, 0, this.getSize().height);
 			g2d.dispose();
 		}
 		
